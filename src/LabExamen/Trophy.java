@@ -8,15 +8,16 @@ package LabExamen;
  *
  * @author tomea
  */
-public class Entry {
-    String user;
-    long posicion;
-    Entry siguiente;
+public enum Trophy {
+   PLATINO(5),
+    ORO(3),
+    PLATA(2),
+    BRONCE(1);
 
-    public Entry(String user,long posicion) {
-        this.user=user;
-        this.posicion = posicion;
-        this.siguiente = null;
+public final int points;
+
+    Trophy(int points) {
+        this.points = points;
     }
- 
+    
 }
