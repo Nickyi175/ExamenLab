@@ -16,7 +16,18 @@ public class Entry {
     public Entry(String user,long posicion) {
         this.user=user;
         this.posicion = posicion;
-        this.siguiente = null;
+        siguiente = null;
     }
+    
+//     public int codigo;
+//    public String nombre;
+//    public Nodo siguiente;
+//
+//
+//    public Nodo(int code, String name){
+//      this.codigo=code;
+//      this.nombre=name;
+//      siguiente=null;
+//    }
  
 }
