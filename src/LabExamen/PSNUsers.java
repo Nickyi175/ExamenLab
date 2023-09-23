@@ -10,19 +10,21 @@ import java.util.Date;
  * @author tomea
  */
 public class PSNUsers {
-   private RandomAccessFile raf; 
-   private HashTable users;
- 
+   RandomAccessFile raf; 
+   HashTable users;
+   long tamaño=0;
+   
   
 
     public PSNUsers() throws IOException {
         raf = new RandomAccessFile("psn", "rw");
-        this.users=new HashTable();
+//        this.users=new HashTable();
         reloadHashTable();
     }
 
    private void reloadHashTable() throws IOException {
         raf.seek(0); 
+        users=new HashTable();
         while (raf.getFilePointer() < raf.length()) {
                 System.out.println("\nENTRO A WHILE DE RELOAD\n");
                 String username = raf.readUTF();
@@ -32,23 +34,32 @@ public class PSNUsers {
                 System.out.println(username);
         }
     }
+
    
    //LISTO
-    public void addUser(String username) throws IOException {
+    public boolean addUser(String username) throws IOException {
+        if (users.search(username) != -1) {
+            System.out.println("no se hallo nombre");
+            return false;
+        }
         long position = raf.length(); // Obtener la posición al final del archivo
         raf.seek(position); // Mover al final del archivo
         raf.writeUTF(username); // Escribir el nombre de usuario
-        int points = 0;
-        raf.writeInt(points); // agrega puntos
-        int trofeos = 0;
-        raf.writeInt(trofeos); // agrega trofeos
+        raf.writeInt(0); // agrega puntos
+        raf.writeInt(0); // agrega trofeos
         raf.writeBoolean(true); // usuario activo
         users.add(username, raf.getFilePointer());
+        System.out.println("se agrego");
+        return true;
     }
     
     //LISTO
     public void deactivateUser(String username) throws IOException {
         long position = users.search(username);
+        if (users.search(username) == -1) {
+            System.out.println("no se hallo");
+            return;
+        }
         if (position != -1) {
             raf.seek(position); // Mover al registro correspondiente
             raf.writeBoolean(false); // Marcar como inactivo
@@ -56,7 +67,11 @@ public class PSNUsers {
         }
     }
     
-    public void addTrophyTo(String username, String trophyGame, String trophyName, Trophy type,String date) throws IOException {
+    public boolean addTrophyTo(String username, String trophyGame, String trophyName, Trophy type) throws IOException {
+        if (users.search(username) == -1) {
+            return false;
+        }
+        
         long position = users.search(username);
         if (position != -1) {
             raf.seek(position - 9);
@@ -77,24 +92,31 @@ public class PSNUsers {
             rafTrophy.writeUTF(type.name());
             rafTrophy.writeUTF(trophyGame);
             rafTrophy.writeUTF(trophyName);
-            rafTrophy.writeUTF(date);
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");  
+            Date date = new Date();  
+            rafTrophy.writeUTF(formatter.format(date));
         }
+        return true;
     }
 
     public String playerInfo(String username) throws IOException {
+         if (users.search(username) == -1) {
+            System.out.println("no se hallo");
+            return "";
+        }
         long position = users.search(username);
         StringBuilder info = new StringBuilder();
         if (position != -1) {
             raf.seek(position - 9 - username.length() - 2); // 2 bytes for UTF string length
-            info.append("Username: " + raf.readUTF() + "\n");
-            info.append("Points: " + raf.readInt() + "\n");
-            int trophies = raf.readInt();
-            info.append("Trophies: " + trophies + "\n");
-            System.out.println("Trphies: " + trophies);
-            info.append("Active: " + raf.readBoolean() + "\n");
+            info.append("User: " + raf.readUTF() + "\n");
+            info.append("Puntos: " + raf.readInt() + "\n");
+            int trofeos = raf.readInt();
+            info.append("Trofeos: " + trofeos + "\n");
+            System.out.println(trofeos);
+            info.append("Activo: " + raf.readBoolean() + "\n");
 
             // print trophies
-            RandomAccessFile trophyFile = new RandomAccessFile("psn_trophies", "rw");
+            RandomAccessFile trophyFile = new RandomAccessFile("psn_trphy", "rw");
             trophyFile.seek(0);
             while (trophyFile.getFilePointer() < trophyFile.length()) {
                 if (trophyFile.readUTF().equals(username)) {

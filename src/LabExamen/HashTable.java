@@ -8,15 +8,24 @@ public class HashTable {
     //FUNCION ADD
      public void add(String username, long position){
          Entry entry=new Entry(username,position);
+         if (search(username) != -1) {
+             System.out.println("no se hallo nombre");
+            return; 
+        }
         if (lista==null){
             lista=entry;
-        }else{
-            Entry tmp=lista;
+            return;
+        }
+        Entry tmp=lista;
+        
+            
+            
             while(tmp.siguiente!=null){
                     tmp=tmp.siguiente;
                 }
                 tmp.siguiente=entry;
-        }
+        
+        
              
     }
      
