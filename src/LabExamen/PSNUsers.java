@@ -17,7 +17,7 @@ public class PSNUsers {
   
 
     public PSNUsers() throws IOException {
-        raf = new RandomAccessFile("psn", "rw");
+        raf = new RandomAccessFile("psn.dat", "rw");
 //        this.users=new HashTable();
         reloadHashTable();
     }
